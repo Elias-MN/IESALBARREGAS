@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { SplineScene } from './ui/SplineScene';
 import { Spotlight } from './ui/Spotlight';
@@ -10,6 +10,20 @@ export function Hero() {
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.6], [0, -60]);
+
+  const [showSpline, setShowSpline] = useState(false);
+
+  useEffect(() => {
+    // Defer the heavy Spline 3D scene (597KB JS + 1.2MB scene) until the browser is idle,
+    // so LCP (text headline) and initial interactivity are not blocked.
+    const cb = () => setShowSpline(true);
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(cb, { timeout: 3000 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(cb, 1500);
+    return () => clearTimeout(id);
+  }, []);
 
   const tags = ['DAW', 'DAM', 'ASIR', 'IA & Big Data', 'Cloud'];
 
@@ -100,7 +114,7 @@ export function Hero() {
             >
               <a
                 href="#ciclos"
-                className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:bg-indigo-400 hover:shadow-[0_0_32px_rgba(99,102,241,0.45)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#030712]"
+                className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm transition-all duration-200 hover:bg-indigo-500 hover:shadow-[0_0_32px_rgba(99,102,241,0.45)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#030712]"
               >
                 Explorar ciclos
                 <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -127,10 +141,12 @@ export function Hero() {
             {/* Ambient glow — pointer-events-none para no bloquear el canvas de Spline */}
             <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.18)_0%,transparent_70%)] pointer-events-none" />
 
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="w-full h-full"
-            />
+            {showSpline && (
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
+              />
+            )}
 
             {/* Fade inferior para disimular el corte del modelo */}
             <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#030712] via-[#030712]/60 to-transparent pointer-events-none" />

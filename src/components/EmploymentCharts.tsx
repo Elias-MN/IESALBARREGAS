@@ -20,7 +20,8 @@ const TIME_DATA = [
 // ── Barras horizontales por ciclo ──────────────────────────────────────────
 function CycleBars({ isInView }: { isInView: boolean }) {
   return (
-    <div className="space-y-5" role="list" aria-label="Inserción laboral por ciclo">
+    <div>
+      <div className="space-y-5" role="list" aria-label="Inserción laboral por ciclo">
       {CYCLE_DATA.map((row, i) => (
         <div key={row.cycle} role="listitem">
           {/* Cabecera fila */}
@@ -79,7 +80,9 @@ function CycleBars({ isInView }: { isInView: boolean }) {
         </div>
       ))}
 
-      {/* Leyenda */}
+      </div>
+
+      {/* Leyenda — fuera del list principal para evitar ARIA nesting inválido */}
       <div className="flex flex-wrap gap-4 pt-2" role="list" aria-label="Leyenda del gráfico">
         {[
           { label: 'Empleo en el sector', color: '#a78bfa' },

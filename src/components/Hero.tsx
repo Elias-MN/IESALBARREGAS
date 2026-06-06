@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { SplineScene } from './ui/SplineScene';
 import { Spotlight } from './ui/Spotlight';
 
 export function Hero() {
@@ -10,20 +9,6 @@ export function Hero() {
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.6], [0, -60]);
-
-  const [showSpline, setShowSpline] = useState(false);
-
-  useEffect(() => {
-    // Defer the heavy Spline 3D scene (597KB JS + 1.2MB scene) until the browser is idle,
-    // so LCP (text headline) and initial interactivity are not blocked.
-    const cb = () => setShowSpline(true);
-    if ('requestIdleCallback' in window) {
-      const id = requestIdleCallback(cb, { timeout: 3000 });
-      return () => cancelIdleCallback(id);
-    }
-    const id = setTimeout(cb, 1500);
-    return () => clearTimeout(id);
-  }, []);
 
   const tags = ['DAW', 'DAM', 'ASIR', 'IA & Big Data', 'Cloud'];
 
@@ -130,26 +115,20 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* ── Right: 3D Scene ── */}
+          {/* ── Right: 3D Scene slot (filled by SplineHero client:idle island) ── */}
           <motion.div
+            id="hero-spline-slot"
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.35, ease: 'easeOut' }}
             className="relative h-[400px] md:h-[520px] lg:h-[640px] hidden md:block"
             aria-hidden="true"
           >
-            {/* Ambient glow — pointer-events-none para no bloquear el canvas de Spline */}
+            {/* Ambient glow */}
             <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.18)_0%,transparent_70%)] pointer-events-none" />
 
-            {showSpline && (
-              <SplineScene
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-              />
-            )}
-
             {/* Fade inferior para disimular el corte del modelo */}
-            <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#030712] via-[#030712]/60 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#030712] via-[#030712]/60 to-transparent pointer-events-none z-10" />
           </motion.div>
         </div>
       </div>

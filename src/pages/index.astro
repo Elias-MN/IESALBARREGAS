@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { Hero } from '../components/Hero';
+import { SplineHero } from '../components/SplineHero';
 import { StatsCounter } from '../components/StatsCounter';
 import { EmploymentCharts } from '../components/EmploymentCharts';
 import { PartnersGrid } from '../components/PartnersGrid';
@@ -137,6 +138,12 @@ const cycles = [
   <main id="main-content">
     <!-- ── Hero ──────────────────────────────────────────────── -->
     <Hero client:load />
+    <!-- Spline 3D island: loads only on desktop during browser idle time.
+         Separate from Hero so react-spline never enters Hero's module graph. -->
+    <SplineHero
+      client:idle
+      scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+    />
 
     <!-- ── Stats ─────────────────────────────────────────────── -->
     <div class="section-divider" role="separator" />

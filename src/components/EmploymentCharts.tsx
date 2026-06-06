@@ -185,11 +185,9 @@ export function EmploymentCharts() {
                     whileInView={{ width: `${item.pct}%` }}
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.3 + i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="h-full rounded-lg flex items-center justify-end pr-3"
-                    style={{ backgroundColor: item.color, minWidth: item.pct > 5 ? undefined : '40px' }}
-                  >
-                    <span className="text-xs font-bold text-white" aria-hidden="true">{item.pct}%</span>
-                  </motion.div>
+                    className="h-full rounded-lg"
+                    style={{ backgroundColor: item.color }}
+                  />
                 </div>
                 <span className="w-10 shrink-0 text-right text-sm font-semibold text-slate-300" aria-label={`${item.pct} por ciento`}>{item.pct}%</span>
               </motion.div>

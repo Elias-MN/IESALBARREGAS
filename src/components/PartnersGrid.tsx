@@ -4,28 +4,35 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { partners, getInitials, type Partner } from '../data/partners';
 
+function useIsDesktop() {
+  const [v, setV] = useState(false);
+  useEffect(() => { setV(window.matchMedia('(hover: hover) and (pointer: fine)').matches); }, []);
+  return v;
+}
+
 // ── Tarjeta uniforme cuadrada ─────────────────────────────────────────────────
 function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
+  const isDesktop = useIsDesktop();
   const [hovered, setHovered] = useState(false);
 
   // Los localLogos son de confianza: empezamos en true.
-  // Las URLs de Clearbit son inciertas: empezamos en false y solo
-  // activamos si la imagen confirma que tiene contenido real (probe).
+  // Clearbit solo se prueba en desktop — en mobile evitamos ~20 requests
+  // innecesarios y mostramos directamente el estilo tipográfico.
   const isClearbit = !partner.localLogo && !!partner.domain;
   const [logoReady, setLogoReady] = useState(!isClearbit);
 
   const src = partner.localLogo
     ?? (partner.domain ? `https://logo.clearbit.com/${partner.domain}` : null);
 
-  // Pre-sondeo: descarga la imagen antes de mostrar el layout de logo
+  // Pre-sondeo solo en desktop (isDesktop cambia false→true tras el mount)
   useEffect(() => {
-    if (!isClearbit || !partner.domain) return;
+    if (!isClearbit || !partner.domain || !isDesktop) return;
     const probe = new Image();
     probe.onload  = () => setLogoReady(probe.naturalWidth > 1 && probe.naturalHeight > 1);
     probe.onerror = () => setLogoReady(false);
     probe.src = `https://logo.clearbit.com/${partner.domain}`;
     return () => { probe.onload = null; probe.onerror = null; };
-  }, [isClearbit, partner.domain]);
+  }, [isClearbit, partner.domain, isDesktop]);
 
   const showImage = logoReady && !!src;
   const initials  = getInitials(partner.name);
@@ -38,10 +45,10 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-32px' }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.6), ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -5, scale: 1.06, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+      whileHover={isDesktop ? { y: -5, scale: 1.06, transition: { type: 'spring', stiffness: 500, damping: 22 } } : {}}
       whileTap={{ scale: 0.97 }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      onHoverStart={isDesktop ? () => setHovered(true) : undefined}
+      onHoverEnd={isDesktop ? () => setHovered(false) : undefined}
       className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-[0_8px_24px_rgba(37,99,235,0.18)] hover:border-blue-200 transition-shadow duration-200 relative"
       title={partner.name}
     >
@@ -65,11 +72,13 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
       ) : (
         /* ── Sin logo (o mientras carga Clearbit): tipografía institucional ── */
         <div className="h-full relative overflow-hidden flex items-center justify-center px-2">
-          <motion.div
-            className="absolute inset-0"
-            animate={{ backgroundColor: hovered ? '#eff6ff' : '#ffffff' }}
-            transition={{ duration: 0.25 }}
-          />
+          {isDesktop && (
+            <motion.div
+              className="absolute inset-0"
+              animate={{ backgroundColor: hovered ? '#eff6ff' : '#ffffff' }}
+              transition={{ duration: 0.25 }}
+            />
+          )}
           <span
             className="absolute font-black leading-none select-none pointer-events-none"
             style={{
@@ -83,7 +92,7 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
           </span>
           <motion.span
             className={`relative z-10 ${nameSz} font-bold text-blue-700 text-center leading-tight`}
-            animate={{ scale: hovered ? 1.05 : 1 }}
+            animate={isDesktop ? { scale: hovered ? 1.05 : 1 } : {}}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             {partner.name}
@@ -91,8 +100,8 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
         </div>
       )}
 
-      {/* Shimmer diagonal en hover — solo si hay logo */}
-      {showImage && (
+      {/* Shimmer diagonal en hover — solo desktop + logo */}
+      {isDesktop && showImage && (
         <AnimatePresence>
           {hovered && (
             <motion.div

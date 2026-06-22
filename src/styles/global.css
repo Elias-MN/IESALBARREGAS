@@ -193,7 +193,14 @@
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-/* Reduce motion: desactiva animaciones decorativas */
+/* Mobile: desactiva animaciones decorativas no esenciales */
+@media (max-width: 767px) {
+  .shimmer-bar            { animation: none; transform: none; }
+  .gradient-text-animated { animation: none; background-position: 0% center; }
+  .cta-glow               { animation: none; }
+}
+
+/* Reduce motion: igual para cualquier dispositivo */
 @media (prefers-reduced-motion: reduce) {
   .gradient-text-animated,
   .shimmer-bar,

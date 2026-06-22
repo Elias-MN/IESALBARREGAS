@@ -6,6 +6,12 @@ import {
   useMotionTemplate, useMotionValue, useSpring, useTransform,
 } from 'framer-motion';
 
+function useIsDesktop() {
+  const [v, setV] = useState(false);
+  useEffect(() => { setV(window.matchMedia('(hover: hover) and (pointer: fine)').matches); }, []);
+  return v;
+}
+
 interface StatItem {
   value: number;
   suffix: string;
@@ -73,17 +79,17 @@ function Counter({ value, suffix, duration = 1800, start }: {
   return <span aria-label={`${value}${suffix}`}>{count}{suffix}</span>;
 }
 
-// ── Tarjeta con 3D tilt + spotlight de cursor ─────────────────────────────────
+// ── Tarjeta con 3D tilt + spotlight (solo desktop) ───────────────────────────
 function TiltCard({ stat, i, isInView }: { stat: StatItem; i: number; isInView: boolean }) {
+  const isDesktop = useIsDesktop();
+
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-
   const rotateX = useSpring(useTransform(mouseY, [0, 1], [7, -7]), { stiffness: 300, damping: 25 });
   const rotateY = useSpring(useTransform(mouseX, [0, 1], [-7, 7]), { stiffness: 300, damping: 25 });
-
-  const spotX = useTransform(mouseX, [0, 1], ['0%', '100%']);
-  const spotY = useTransform(mouseY, [0, 1], ['0%', '100%']);
-  const spotBg = useMotionTemplate`radial-gradient(220px circle at ${spotX} ${spotY}, rgba(37,99,235,0.11), transparent 80%)`;
+  const spotX   = useTransform(mouseX, [0, 1], ['0%', '100%']);
+  const spotY   = useTransform(mouseY, [0, 1], ['0%', '100%']);
+  const spotBg  = useMotionTemplate`radial-gradient(220px circle at ${spotX} ${spotY}, rgba(37,99,235,0.11), transparent 80%)`;
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -101,9 +107,8 @@ function TiltCard({ stat, i, isInView }: { stat: StatItem; i: number; isInView: 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6, delay: i * 0.1, ease: 'easeOut' }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      {...(isDesktop && { onMouseMove: handleMouseMove, onMouseLeave: handleMouseLeave })}
+      style={isDesktop ? { rotateX, rotateY, transformPerspective: 900 } : {}}
       className="group"
     >
       <div
@@ -118,12 +123,14 @@ function TiltCard({ stat, i, isInView }: { stat: StatItem; i: number; isInView: 
           <p className="text-slate-500 text-xs mt-1 leading-snug">{stat.sublabel}</p>
         </div>
 
-        {/* Cursor spotlight — encima de todo, sin interactividad */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: spotBg }}
-          aria-hidden="true"
-        />
+        {/* Spotlight solo en desktop */}
+        {isDesktop && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: spotBg }}
+            aria-hidden="true"
+          />
+        )}
       </div>
     </motion.div>
   );

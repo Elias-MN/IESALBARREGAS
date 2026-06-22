@@ -1,27 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { partners, getInitials, type Partner } from '../data/partners';
 
 // ── Tarjeta uniforme cuadrada ─────────────────────────────────────────────────
 function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
-  const [failed,  setFailed]  = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const src      = partner.localLogo ?? (partner.domain ? `https://logo.clearbit.com/${partner.domain}` : null);
-  const hasImage = src !== null && !failed;
-  const initials = getInitials(partner.name);
-  const len      = partner.name.length;
-  const nameSz   = len <= 6 ? 'text-base' : len <= 12 ? 'text-sm' : len <= 20 ? 'text-xs' : 'text-[10px]';
+  // Los localLogos son de confianza: empezamos en true.
+  // Las URLs de Clearbit son inciertas: empezamos en false y solo
+  // activamos si la imagen confirma que tiene contenido real (probe).
+  const isClearbit = !partner.localLogo && !!partner.domain;
+  const [logoReady, setLogoReady] = useState(!isClearbit);
 
-  function handleLoad(e: React.SyntheticEvent<HTMLImageElement>) {
-    // Clearbit devuelve píxeles transparentes 1×1 cuando no tiene el logo
-    const img = e.currentTarget;
-    if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
-      setFailed(true);
-    }
-  }
+  const src = partner.localLogo
+    ?? (partner.domain ? `https://logo.clearbit.com/${partner.domain}` : null);
+
+  // Pre-sondeo: descarga la imagen antes de mostrar el layout de logo
+  useEffect(() => {
+    if (!isClearbit || !partner.domain) return;
+    const probe = new Image();
+    probe.onload  = () => setLogoReady(probe.naturalWidth > 1 && probe.naturalHeight > 1);
+    probe.onerror = () => setLogoReady(false);
+    probe.src = `https://logo.clearbit.com/${partner.domain}`;
+    return () => { probe.onload = null; probe.onerror = null; };
+  }, [isClearbit, partner.domain]);
+
+  const showImage = logoReady && !!src;
+  const initials  = getInitials(partner.name);
+  const len       = partner.name.length;
+  const nameSz    = len <= 6 ? 'text-base' : len <= 12 ? 'text-sm' : len <= 20 ? 'text-xs' : 'text-[10px]';
 
   return (
     <motion.article
@@ -36,16 +45,14 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
       className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-[0_8px_24px_rgba(37,99,235,0.18)] hover:border-blue-200 transition-shadow duration-200 relative"
       title={partner.name}
     >
-      {hasImage ? (
-        /* ── Con logo: imagen + nombre ── */
+      {showImage ? (
+        /* ── Logo confirmado ── */
         <div className="h-full flex flex-col">
           <div className="flex-1 flex items-center justify-center bg-white p-3 min-h-0">
             <img
               src={src!}
               alt=""
               className="max-h-full max-w-full object-contain"
-              onError={() => setFailed(true)}
-              onLoad={handleLoad}
               loading="lazy"
             />
           </div>
@@ -56,15 +63,13 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
           </div>
         </div>
       ) : (
-        /* ── Sin logo: tipografía en azul institucional ── */
+        /* ── Sin logo (o mientras carga Clearbit): tipografía institucional ── */
         <div className="h-full relative overflow-hidden flex items-center justify-center px-2">
-          {/* Fondo animado en hover */}
           <motion.div
             className="absolute inset-0"
             animate={{ backgroundColor: hovered ? '#eff6ff' : '#ffffff' }}
             transition={{ duration: 0.25 }}
           />
-          {/* Iniciales fantasma */}
           <span
             className="absolute font-black leading-none select-none pointer-events-none"
             style={{
@@ -76,7 +81,6 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
           >
             {initials}
           </span>
-          {/* Nombre */}
           <motion.span
             className={`relative z-10 ${nameSz} font-bold text-blue-700 text-center leading-tight`}
             animate={{ scale: hovered ? 1.05 : 1 }}
@@ -87,8 +91,8 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
         </div>
       )}
 
-      {/* Shimmer de luz en hover — solo para tarjetas con logo */}
-      {hasImage && (
+      {/* Shimmer diagonal en hover — solo si hay logo */}
+      {showImage && (
         <AnimatePresence>
           {hovered && (
             <motion.div

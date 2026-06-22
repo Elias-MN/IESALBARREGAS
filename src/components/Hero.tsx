@@ -12,7 +12,8 @@ export function Hero() {
 
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const y       = useTransform(scrollYProgress, [0, 0.6], [0, -60]);
+  // Sin y-parallax: en mobile min-h-dvh cambia al ocultarse la barra URL,
+  // lo que dispara un salto en scrollYProgress y el contenido saltaba 60px.
 
   return (
     <section
@@ -38,7 +39,7 @@ export function Hero() {
       {/* ── Contenido ── */}
       <div className="relative z-10 w-full px-6 lg:px-8 py-32">
         <motion.div
-          style={{ opacity, y }}
+          style={{ opacity }}
           className="mx-auto max-w-2xl flex flex-col items-center gap-6 text-center"
         >
 

@@ -19,32 +19,32 @@ const STATS: StatItem[] = [
     suffix: '%',
     label: 'Inserción laboral',
     sublabel: 'en menos de 6 meses',
-    color: 'from-indigo-400 to-indigo-600',
-    glow: 'rgba(99,102,241,0.25)',
+    color: 'from-blue-500 to-blue-700',
+    glow: 'rgba(37,99,235,0.12)',
   },
   {
     value: 53,
     suffix: '%',
     label: 'Empleo en < 3 meses',
     sublabel: 'desde que finalizaron',
-    color: 'from-cyan-400 to-cyan-600',
-    glow: 'rgba(34,211,238,0.2)',
+    color: 'from-cyan-500 to-cyan-700',
+    glow: 'rgba(8,145,178,0.12)',
   },
   {
     value: 50,
     suffix: '+',
     label: 'Empresas socias',
     sublabel: 'Que contratan regularmente',
-    color: 'from-violet-400 to-violet-600',
-    glow: 'rgba(167,139,250,0.2)',
+    color: 'from-violet-500 to-violet-700',
+    glow: 'rgba(109,40,217,0.12)',
   },
   {
     value: 70,
     suffix: '%',
     label: 'Trabaja en Extremadura',
     sublabel: 'empleo local de calidad',
-    color: 'from-emerald-400 to-emerald-600',
-    glow: 'rgba(52,211,153,0.2)',
+    color: 'from-emerald-500 to-emerald-700',
+    glow: 'rgba(5,150,105,0.12)',
   },
 ];
 
@@ -82,7 +82,7 @@ export function StatsCounter() {
   return (
     <section
       ref={ref}
-      className="relative py-20 px-6 lg:px-8"
+      className="relative py-20 px-6 lg:px-8 bg-slate-50"
       aria-labelledby="stats-heading"
     >
       <div className="max-w-7xl mx-auto">
@@ -92,7 +92,7 @@ export function StatsCounter() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center text-sm font-semibold uppercase tracking-widest text-slate-400 mb-12"
+          className="text-center text-sm font-semibold uppercase tracking-widest text-slate-500 mb-12"
         >
           Datos reales · {new Date().getFullYear()} encuesta a egresados
         </motion.p>
@@ -107,8 +107,8 @@ export function StatsCounter() {
               transition={{ duration: 0.6, delay: i * 0.1, ease: 'easeOut' }}
             >
               <div
-                className="glass glass-hover rounded-2xl p-6 lg:p-8 flex flex-col gap-3 h-full"
-                style={{ boxShadow: `0 0 40px ${stat.glow}` }}
+                className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 flex flex-col gap-3 h-full shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-200"
+                style={{ boxShadow: `0 2px 16px ${stat.glow}, 0 1px 4px rgba(0,0,0,0.04)` }}
               >
                 <div
                   className={`font-display text-4xl lg:text-5xl font-extrabold bg-gradient-to-br ${stat.color} bg-clip-text text-transparent tabular-nums`}
@@ -116,8 +116,8 @@ export function StatsCounter() {
                   <Counter value={stat.value} suffix={stat.suffix} start={isInView} />
                 </div>
                 <div>
-                  <p className="text-slate-100 font-semibold text-sm lg:text-base leading-tight">{stat.label}</p>
-                  <p className="text-slate-400 text-xs mt-1 leading-snug">{stat.sublabel}</p>
+                  <p className="text-slate-800 font-semibold text-sm lg:text-base leading-tight">{stat.label}</p>
+                  <p className="text-slate-500 text-xs mt-1 leading-snug">{stat.sublabel}</p>
                 </div>
               </div>
             </motion.div>

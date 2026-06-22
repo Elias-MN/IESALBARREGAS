@@ -10,17 +10,17 @@ const Spline = lazy(() => import('@splinetool/react-spline'));
 
 interface Props {
   scene: string;
+  slotId?: string;
 }
 
-export function SplineHero({ scene }: Props) {
+export function SplineHero({ scene, slotId = 'spline-slot' }: Props) {
   const [target, setTarget] = useState<Element | null>(null);
 
   useEffect(() => {
-    // Skip entirely on mobile: the container is hidden md:block, so no visual loss
-    // and we avoid downloading ~2MB of 3D resources on slow connections.
+    // Skip entirely on mobile: no visual loss and avoids downloading ~2MB on slow connections.
     if (!window.matchMedia('(min-width: 768px)').matches) return;
-    setTarget(document.getElementById('hero-spline-slot'));
-  }, []);
+    setTarget(document.getElementById(slotId));
+  }, [slotId]);
 
   if (!target) return null;
 

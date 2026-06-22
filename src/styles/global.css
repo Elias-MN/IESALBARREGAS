@@ -8,86 +8,86 @@
   }
 
   body {
-    background-color: #030712;
-    color: #f1f5f9;
+    background-color: #ffffff;
+    color: #0f172a;
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: rgba(99, 102, 241, 0.3);
-    color: #e0e7ff;
+    background-color: rgba(37, 99, 235, 0.15);
+    color: #1e3a8a;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #f1f5f9;
   }
   ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #cbd5e1;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #94a3b8;
   }
 }
 
 @layer components {
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 0, 0, 0.07);
   }
 
   .glass-hover {
     transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
   }
   .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(37, 99, 235, 0.22);
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.09), 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 40%, #67e8f9 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .glow-indigo {
-    box-shadow: 0 0 30px rgba(99, 102, 241, 0.25), 0 0 60px rgba(99, 102, 241, 0.1);
+  .glow-blue {
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.2), 0 0 48px rgba(37, 99, 235, 0.08);
   }
 
   .loader {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid rgba(99, 102, 241, 0.2);
-    border-top-color: #6366f1;
+    border: 2px solid rgba(37, 99, 235, 0.2);
+    border-top-color: #2563eb;
     animation: spin 0.8s linear infinite;
   }
 
   .section-divider {
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
     height: 1px;
     width: 100%;
   }
 
   .bg-mesh {
-    background-color: #030712;
+    background-color: #ffffff;
     background-image:
-      radial-gradient(ellipse 80% 60% at 70% -10%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at -10% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 90% 90%, rgba(167, 139, 250, 0.08) 0%, transparent 50%);
+      radial-gradient(ellipse 80% 60% at 70% -10%, rgba(37, 99, 235, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at -10% 80%, rgba(79, 70, 229, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 90% 90%, rgba(124, 58, 237, 0.03) 0%, transparent 50%);
   }
 
   .dot-grid {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 }

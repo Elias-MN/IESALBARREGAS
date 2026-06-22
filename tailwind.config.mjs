@@ -8,9 +8,9 @@ export default {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
       },
       colors: {
-        brand: '#6366f1',
-        'brand-light': '#818cf8',
-        'brand-cyan': '#22d3ee',
+        brand: '#2563eb',
+        'brand-light': '#3b82f6',
+        'brand-cyan': '#0891b2',
       },
       animation: {
         'gradient-x': 'gradient-x 12s ease infinite',

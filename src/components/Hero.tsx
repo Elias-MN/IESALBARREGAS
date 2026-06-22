@@ -5,11 +5,11 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Spotlight } from './ui/Spotlight';
 
 const HERO_IMAGE = '/images/iesAlbarregas.jpg';
-
 const TAGS = ['DAW', 'DAM', 'ASIR', 'IA & Big Data', 'Cloud CE'];
 
 export function Hero() {
   const containerRef = useRef<HTMLElement>(null);
+
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const y       = useTransform(scrollYProgress, [0, 0.6], [0, -60]);
@@ -28,7 +28,6 @@ export function Hero() {
           aria-hidden="true"
           className="w-full h-full object-cover"
         />
-        {/* Overlay uniforme centrado: la foto se ve en todo el ancho */}
         <div className="absolute inset-0 bg-white/45" />
         <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-white to-transparent" />
       </div>
@@ -36,7 +35,7 @@ export function Hero() {
       <div className="absolute inset-0 dot-grid opacity-[0.10] z-[1]" />
       <Spotlight className="top-0 left-1/2 -translate-x-1/2" fill="rgba(37,99,235,0.07)" />
 
-      {/* ── Contenido centrado ── */}
+      {/* ── Contenido ── */}
       <div className="relative z-10 w-full px-6 lg:px-8 py-32">
         <motion.div
           style={{ opacity, y }}
@@ -72,7 +71,7 @@ export function Hero() {
               Formación Profesional
             </span>
             <span
-              className="block font-black gradient-text mt-1"
+              className="block font-black gradient-text-animated mt-1"
               style={{ fontSize: 'clamp(2.8rem, 8.5vw, 5.5rem)' }}
             >
               Informática
@@ -103,14 +102,17 @@ export function Hero() {
             role="list"
             aria-label="Ciclos formativos"
           >
-            {TAGS.map((tag) => (
-              <span
+            {TAGS.map((tag, i) => (
+              <motion.span
                 key={tag}
                 role="listitem"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.4 + i * 0.06 }}
                 className="px-3 py-1.5 rounded-lg bg-white/80 backdrop-blur-sm border border-slate-200 text-sm text-slate-700 font-medium"
               >
                 {tag}
-              </span>
+              </motion.span>
             ))}
           </motion.div>
 
@@ -121,21 +123,28 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.46 }}
             className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto"
           >
-            <a
+            <motion.a
               href="#datos"
-              className="group inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm transition-all duration-200 hover:bg-blue-500 hover:shadow-[0_4px_16px_rgba(37,99,235,0.35)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="group inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 hover:shadow-[0_4px_16px_rgba(37,99,235,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Ver datos reales
               <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </a>
-            <a
+            </motion.a>
+
+            <motion.a
               href="#empresas-colaboradoras"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-300 bg-white/70 backdrop-blur-sm text-slate-700 font-semibold text-sm transition-all duration-200 hover:bg-white hover:border-slate-400 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-300 bg-white/70 backdrop-blur-sm text-slate-700 font-semibold text-sm hover:bg-white hover:border-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               Ver empresas
-            </a>
+            </motion.a>
           </motion.div>
 
         </motion.div>
@@ -150,7 +159,11 @@ export function Hero() {
         aria-hidden="true"
       >
         <span className="text-[10px] font-semibold tracking-[0.2em] uppercase">Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-slate-300 to-transparent" />
+        <motion.div
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-px h-10 bg-gradient-to-b from-slate-300 to-transparent"
+        />
       </motion.div>
     </section>
   );

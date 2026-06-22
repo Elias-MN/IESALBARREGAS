@@ -1,31 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { partners, getInitials, type Partner } from '../data/partners';
 
 // ── Tarjeta uniforme cuadrada ─────────────────────────────────────────────────
 function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
-  const [failed, setFailed] = useState(false);
+  const [failed,  setFailed]  = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-  const src       = partner.localLogo ?? (partner.domain ? `https://logo.clearbit.com/${partner.domain}` : null);
-  const hasImage  = src !== null && !failed;
-  const initials  = getInitials(partner.name);
-  const len       = partner.name.length;
-  const nameSz    = len <= 6 ? 'text-base' : len <= 12 ? 'text-sm' : len <= 20 ? 'text-xs' : 'text-[10px]';
+  const src      = partner.localLogo ?? (partner.domain ? `https://logo.clearbit.com/${partner.domain}` : null);
+  const hasImage = src !== null && !failed;
+  const initials = getInitials(partner.name);
+  const len      = partner.name.length;
+  const nameSz   = len <= 6 ? 'text-base' : len <= 12 ? 'text-sm' : len <= 20 ? 'text-xs' : 'text-[10px]';
+
+  function handleLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    // Clearbit devuelve píxeles transparentes 1×1 cuando no tiene el logo
+    const img = e.currentTarget;
+    if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+      setFailed(true);
+    }
+  }
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 16, scale: 0.92 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-32px' }}
-      transition={{ duration: 0.35, delay: Math.min(index * 0.025, 0.5) }}
-      whileHover={{ y: -3, transition: { duration: 0.15 } }}
-      className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-blue-200 transition-shadow duration-200"
+      transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.6), ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -5, scale: 1.06, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+      whileTap={{ scale: 0.97 }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:shadow-[0_8px_24px_rgba(37,99,235,0.18)] hover:border-blue-200 transition-shadow duration-200 relative"
       title={partner.name}
     >
       {hasImage ? (
-        /* ── Con logo: imagen arriba, nombre abajo ── */
+        /* ── Con logo: imagen + nombre ── */
         <div className="h-full flex flex-col">
           <div className="flex-1 flex items-center justify-center bg-white p-3 min-h-0">
             <img
@@ -33,6 +45,7 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
               alt=""
               className="max-h-full max-w-full object-contain"
               onError={() => setFailed(true)}
+              onLoad={handleLoad}
               loading="lazy"
             />
           </div>
@@ -43,19 +56,56 @@ function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
           </div>
         </div>
       ) : (
-        /* ── Sin logo: nombre tipográfico en azul institucional ── */
-        <div className="h-full relative overflow-hidden bg-white flex items-center justify-center px-2">
+        /* ── Sin logo: tipografía en azul institucional ── */
+        <div className="h-full relative overflow-hidden flex items-center justify-center px-2">
+          {/* Fondo animado en hover */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{ backgroundColor: hovered ? '#eff6ff' : '#ffffff' }}
+            transition={{ duration: 0.25 }}
+          />
+          {/* Iniciales fantasma */}
           <span
-            className="absolute font-black text-blue-100 leading-none select-none pointer-events-none"
-            style={{ fontSize: '4.5rem' }}
+            className="absolute font-black leading-none select-none pointer-events-none"
+            style={{
+              fontSize: '4.5rem',
+              color: hovered ? 'rgba(37,99,235,0.12)' : 'rgba(37,99,235,0.08)',
+              transition: 'color 0.25s',
+            }}
             aria-hidden="true"
           >
             {initials}
           </span>
-          <span className={`relative z-10 ${nameSz} font-bold text-blue-700 text-center leading-tight`}>
+          {/* Nombre */}
+          <motion.span
+            className={`relative z-10 ${nameSz} font-bold text-blue-700 text-center leading-tight`}
+            animate={{ scale: hovered ? 1.05 : 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          >
             {partner.name}
-          </span>
+          </motion.span>
         </div>
+      )}
+
+      {/* Shimmer de luz en hover — solo para tarjetas con logo */}
+      {hasImage && (
+        <AnimatePresence>
+          {hovered && (
+            <motion.div
+              key="shimmer"
+              initial={{ x: '-120%' }}
+              animate={{ x: '220%' }}
+              exit={{ opacity: 0, transition: { duration: 0 } }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                background:
+                  'linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.55) 50%, transparent 75%)',
+              }}
+              aria-hidden="true"
+            />
+          )}
+        </AnimatePresence>
       )}
     </motion.article>
   );

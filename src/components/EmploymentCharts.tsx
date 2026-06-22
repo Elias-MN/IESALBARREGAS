@@ -24,7 +24,6 @@ function CycleBars({ isInView }: { isInView: boolean }) {
       <div className="space-y-5" role="list" aria-label="Inserción laboral por ciclo">
       {CYCLE_DATA.map((row, i) => (
         <div key={row.cycle} role="listitem">
-          {/* Cabecera fila */}
           <div className="flex items-baseline justify-between mb-2">
             <div>
               <span className="text-sm font-bold text-slate-800">{row.cycle}</span>
@@ -39,26 +38,29 @@ function CycleBars({ isInView }: { isInView: boolean }) {
             </span>
           </div>
 
-          {/* Barra apilada */}
           <div
             className="h-8 rounded-xl overflow-hidden flex w-full bg-slate-100"
             role="img"
             aria-label={`${row.cycle}: ${row.sector}% en el sector, ${row.other}% otro empleo, ${row.none}% sin empleo`}
           >
-            {/* Segmento 1: en el sector */}
             <motion.div
               initial={{ width: 0 }}
               animate={isInView ? { width: `${row.sector}%` } : { width: 0 }}
               transition={{ duration: 1, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="h-full flex items-center justify-center shrink-0"
+              className="h-full flex items-center justify-center shrink-0 relative overflow-hidden"
               style={{ backgroundColor: row.color }}
             >
               {row.sector >= 12 && (
-                <span className="text-[11px] font-bold text-white drop-shadow">{row.sector}%</span>
+                <span className="text-[11px] font-bold text-white drop-shadow relative z-10">{row.sector}%</span>
               )}
+              {/* shimmer */}
+              <div
+                className="absolute inset-0 shimmer-bar pointer-events-none"
+                style={{ animationDelay: `${0.2 + i * 0.1 + 1.1}s` }}
+                aria-hidden="true"
+              />
             </motion.div>
 
-            {/* Segmento 2: otro empleo */}
             <motion.div
               initial={{ width: 0 }}
               animate={isInView ? { width: `${row.other}%` } : { width: 0 }}
@@ -70,7 +72,6 @@ function CycleBars({ isInView }: { isInView: boolean }) {
               )}
             </motion.div>
 
-            {/* Segmento 3: sin empleo — ocupa el resto */}
             <div className="h-full flex-1 flex items-center justify-center bg-slate-200">
               {row.none >= 12 && (
                 <span className="text-[11px] font-medium text-slate-500">{row.none}%</span>
@@ -79,10 +80,8 @@ function CycleBars({ isInView }: { isInView: boolean }) {
           </div>
         </div>
       ))}
-
       </div>
 
-      {/* Leyenda — fuera del list principal para evitar ARIA nesting inválido */}
       <div className="flex flex-wrap gap-4 pt-2" role="list" aria-label="Leyenda del gráfico">
         {[
           { label: 'Empleo en el sector', color: '#2563eb' },
@@ -106,6 +105,7 @@ function CycleBars({ isInView }: { isInView: boolean }) {
 export function EmploymentCharts() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+
   return (
     <section
       ref={ref}
@@ -115,7 +115,6 @@ export function EmploymentCharts() {
     >
       <div className="max-w-7xl mx-auto relative">
 
-        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -134,10 +133,8 @@ export function EmploymentCharts() {
           </p>
         </motion.div>
 
-        {/* Charts grid */}
         <div className="grid lg:grid-cols-2 gap-6 mb-10">
 
-          {/* Barras horizontales por ciclo */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -152,7 +149,6 @@ export function EmploymentCharts() {
             <CycleBars isInView={isInView} />
           </motion.div>
 
-          {/* Time to employment */}
           <motion.div
             initial={{ opacity: 0, x: 24 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -167,43 +163,50 @@ export function EmploymentCharts() {
               Del alumnado con inserción laboral relacionada con su formación
             </p>
 
-          <div className="space-y-4" role="list" aria-label="Tiempo hasta primer empleo por categoría">
-            {TIME_DATA.map((item, i) => (
-              <motion.div
-                key={item.label}
-                role="listitem"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              >
-                {/* Label + % — encima en móvil, integrado en línea en desktop */}
-                <div className="flex items-center justify-between mb-1.5 sm:hidden">
-                  <span className="text-sm text-slate-500">{item.label}</span>
-                  <span className="text-sm font-semibold tabular-nums" style={{ color: item.color }}>{item.pct}%</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="hidden sm:block w-36 shrink-0 text-sm text-slate-500">{item.label}</span>
-                  <div className="flex-1 h-7 rounded-lg bg-slate-100 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${item.pct}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, delay: 0.3 + i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="h-full rounded-lg"
-                      style={{ backgroundColor: item.color }}
-                    />
+            <div className="space-y-4" role="list" aria-label="Tiempo hasta primer empleo por categoría">
+              {TIME_DATA.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  role="listitem"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                >
+                  {/* Label + % — encima en móvil */}
+                  <div className="flex items-center justify-between mb-1.5 sm:hidden">
+                    <span className="text-sm text-slate-500">{item.label}</span>
+                    <span className="text-sm font-semibold tabular-nums" style={{ color: item.color }}>{item.pct}%</span>
                   </div>
-                  <span
-                    className="hidden sm:block w-10 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700"
-                    aria-label={`${item.pct} por ciento`}
-                  >
-                    {item.pct}%
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="flex items-center gap-3">
+                    <span className="hidden sm:block w-36 shrink-0 text-sm text-slate-500">{item.label}</span>
+                    <div className="flex-1 h-7 rounded-lg bg-slate-100 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${item.pct}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.3 + i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="h-full rounded-lg relative overflow-hidden"
+                        style={{ backgroundColor: item.color }}
+                      >
+                        {/* shimmer sweep tras la animación */}
+                        <div
+                          className="absolute inset-0 shimmer-bar pointer-events-none"
+                          style={{ animationDelay: `${0.3 + i * 0.12 + 1.0}s` }}
+                          aria-hidden="true"
+                        />
+                      </motion.div>
+                    </div>
+                    <span
+                      className="hidden sm:block w-10 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700"
+                      aria-label={`${item.pct} por ciento`}
+                    >
+                      {item.pct}%
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
 
             <div className="mt-8 flex items-start gap-2.5 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3">
               <svg className="w-4 h-4 shrink-0 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -215,8 +218,7 @@ export function EmploymentCharts() {
             </div>
           </motion.div>
 
-        </div>{/* end charts grid */}
-
+        </div>
       </div>
     </section>
   );

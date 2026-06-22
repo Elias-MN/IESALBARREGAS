@@ -37,10 +37,11 @@
 
 @layer components {
   .glass {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(0, 0, 0, 0.07);
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   }
 
   .glass-hover {
@@ -52,11 +53,28 @@
     box-shadow: 0 8px 32px rgba(37, 99, 235, 0.09), 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
+  /* Gradiente estático para textos en secciones de estadísticas */
   .gradient-text {
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Gradiente animado para el hero — se desplaza suavemente */
+  .gradient-text-animated {
+    background: linear-gradient(
+      135deg,
+      #2563eb 0%,
+      #4f46e5 30%,
+      #7c3aed 60%,
+      #2563eb 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-drift 6s ease-in-out infinite;
   }
 
   .glow-blue {
@@ -90,7 +108,33 @@
     background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
+
+  /* Navbar opacificada al hacer scroll */
+  header.nav-scrolled nav {
+    background: rgba(255, 255, 255, 0.97);
+    border-color: rgba(0, 0, 0, 0.09);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  }
+
+  /* Shimmer sweep en barras de gráfico */
+  .shimmer-bar {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.38) 50%,
+      transparent 100%
+    );
+    transform: translateX(-150%);
+    animation: shimmer-sweep 0.9s ease forwards;
+  }
+
+  /* Pulso del orbe del CTA */
+  .cta-glow {
+    animation: cta-breathe 5s ease-in-out infinite;
+  }
 }
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
 
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -105,6 +149,32 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+@keyframes gradient-drift {
+  0%, 100% { background-position: 0% center; }
+  50%       { background-position: 100% center; }
+}
+
+@keyframes shimmer-sweep {
+  from { transform: translateX(-150%); }
+  to   { transform: translateX(250%); }
+}
+
+@keyframes cta-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* Spotlight SVG del hero */
+@keyframes animate-spotlight {
+  0%   { opacity: 0; transform: translate(-72%, -62%) skewX(-30deg); }
+  100% { opacity: 1; transform: translate(-50%, -40%) skewX(-30deg); }
+}
+.animate-spotlight {
+  animation: animate-spotlight 2s ease forwards;
+}
+
+/* ── Utilidades ─────────────────────────────────────────────────────────── */
 
 .animate-fade-up {
   animation: fade-up 0.6s ease forwards;
@@ -121,4 +191,13 @@
   opacity: 1;
   transform: translateY(0);
   transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+/* Reduce motion: desactiva animaciones decorativas */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text-animated,
+  .shimmer-bar,
+  .cta-glow {
+    animation: none;
+  }
 }

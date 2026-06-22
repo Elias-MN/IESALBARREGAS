@@ -84,7 +84,7 @@ import { ScrollProgress } from '../components/ScrollProgress';
           class="relative rounded-3xl overflow-hidden p-10 lg:p-16"
           style="background: radial-gradient(ellipse 80% 80% at 50% 100%, rgba(37,99,235,0.07) 0%, transparent 70%), #f8fafc; border: 1px solid #e2e8f0;"
         >
-          <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.12)_0%,transparent_70%)] pointer-events-none" aria-hidden="true" />
+          <div class="cta-glow absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.12)_0%,transparent_70%)] pointer-events-none" aria-hidden="true" />
 
           <div class="relative z-10">
             <span class="text-xs font-semibold uppercase tracking-widest text-blue-600">
@@ -198,4 +198,14 @@ import { ScrollProgress } from '../components/ScrollProgress';
       </div>
     </div>
   </footer>
+
+<script>
+  // Navbar se opacifica al salir del hero
+  const header = document.querySelector('header');
+  if (header) {
+    const update = () => header.classList.toggle('nav-scrolled', window.scrollY > 80);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>
 </Layout>
